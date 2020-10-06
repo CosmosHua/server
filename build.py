@@ -67,7 +67,7 @@ TRITON_VERSION_MAP = {
 EXAMPLE_BACKENDS = ['identity', 'square', 'repeat']
 CORE_BACKENDS = ['pytorch', 'tensorrt', 'custom', 'ensemble']
 NONCORE_BACKENDS = [
-    'tensorflow1', 'tensorflow2', 'onnxruntime', 'python', 'dali'
+    'tensorflow1', 'tensorflow2', 'onnxruntime', 'python', 'dali', 'pytorch'
 ]
 FLAGS = None
 
@@ -205,9 +205,7 @@ def core_cmake_args(components, backends, install_dir):
             cargs.append('-DTRITON_ENABLE_{}={}'.format(
                 be.upper(), cmake_enable(be in backends)))
         if (be in CORE_BACKENDS) and (be in backends):
-            if be == 'pytorch':
-                cargs += pytorch_cmake_args()
-            elif be == 'tensorrt':
+            if be == 'tensorrt':
                 pass
             elif be == 'custom':
                 pass
@@ -217,7 +215,7 @@ def core_cmake_args(components, backends, install_dir):
                 fail('unknown core backend {}'.format(be))
 
     cargs.append(
-        '-DTRITON_EXTRA_LIB_PATHS=/opt/tritonserver/lib;/opt/tritonserver/lib/pytorch;/opt/tritonserver/backends/pytorch'
+        '-DTRITON_EXTRA_LIB_PATHS=/opt/tritonserver/lib;/opt/tritonserver/lib/caffe2'
     )
     cargs.append('/workspace/build')
     return cargs
@@ -240,6 +238,8 @@ def backend_cmake_args(images, components, be, install_dir):
         args = []
     elif be == 'dali':
         args = dali_cmake_args()
+    elif be == 'pytorch':
+        args = pytorch_cmake_args()
     elif be in EXAMPLE_BACKENDS:
         args = []
     else:
@@ -478,15 +478,6 @@ RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/nul
     if 'pytorch' in backends:
         df += '''
 # LibTorch and Torchvision headers and libraries
-COPY --from=tritonserver_pytorch \
-     /opt/conda/lib/python3.6/site-packages/torch/lib/libc10.so \
-     /opt/tritonserver/lib/pytorch/
-COPY --from=tritonserver_pytorch \
-     /opt/conda/lib/python3.6/site-packages/torch/lib/libc10_cuda.so \
-     /opt/tritonserver/lib/pytorch/
-COPY --from=tritonserver_pytorch /opt/conda/lib/libmkl_core.so /opt/tritonserver/lib/pytorch/
-COPY --from=tritonserver_pytorch /opt/conda/lib/libmkl_gnu_thread.so /opt/tritonserver/lib/pytorch/
-COPY --from=tritonserver_pytorch /opt/conda/lib/libmkl_intel_lp64.so /opt/tritonserver/lib/pytorch/
 COPY --from=tritonserver_pytorch /opt/conda/lib/python3.6/site-packages/torch/include \
      /opt/tritonserver/include/torch
 COPY --from=tritonserver_pytorch /opt/conda/lib/python3.6/site-packages/torch/lib/libtorch.so \
@@ -680,7 +671,7 @@ COPY --chown=1000:1000 --from=tritonserver_build /tmp/tritonbuild/install/lib/li
 '''
     if 'pytorch' in backends:
         df += '''
-COPY --chown=1000:1000 --from=tritonserver_build /opt/tritonserver/lib/pytorch lib/pytorch
+COPY --chown=1000:1000 --from=tritonserver_build /opt/tritonserver/backends/pytorch/* backends/pytorch/
 '''
     if 'onnxruntime' in backends:
         df += '''
