@@ -106,50 +106,49 @@ class LargePayLoadTest(tu.TestResultCollector):
 
     def test_graphdef(self):
         # graphdef_nobatch_zero_1_float32 is identity model with input shape [-1]
-        for client in self.clients_:
+        for client in self._clients:
             model_name = tu.get_zero_model_name("graphdef_nobatch", 1,
-                                                self.data_type_)
+                                                self._data_type)
             self._test_helper(client, model_name)
 
     def test_savedmodel(self):
         # savedmodel_nobatch_zero_1_float32 is identity model with input shape [-1]
-        for client in self.clients_:
+        for client in self._clients:
             model_name = tu.get_zero_model_name("savedmodel_nobatch", 1,
-                                                self.data_type_)
+                                                self._data_type)
             self._test_helper(client, model_name)
 
     def test_onnx(self):
         # onnx_nobatch_zero_1_float32 is identity model with input shape [-1]
-        for client in self.clients_:
+        for client in self._clients:
             model_name = tu.get_zero_model_name("onnx_nobatch", 1,
-                                                self.data_type_)
-            self._test_helper(client, model_name)
+                                                self._data_type)
 
     def test_python(self):
         # python_nobatch_zero_1_float32 is identity model with input shape [-1]
-        for client in self.clients_:
+        for client in self._clients:
             model_name = tu.get_zero_model_name("python_nobatch", 1,
-                                                self.data_type_)
-            self._test_helper(client, model_name, 'IN', 'OUT')
+                                                self._data_type)
+            self._test_helper(client, model_name, "IN", "OUT")
 
     def test_plan(self):
         # plan_nobatch_zero_1_float32 is identity model with input shape [-1]
-        for client in self.clients_:
+        for client in self._clients:
             model_name = tu.get_zero_model_name("plan_nobatch", 1,
-                                                self.data_type_)
+                                                self._data_type)
             self._test_helper(client, model_name)
 
     def test_libtorch(self):
         # libtorch_nobatch_zero_1_float32 is identity model with input shape [-1]
-        for client in self.clients_:
+        for client in self._clients:
             model_name = tu.get_zero_model_name("libtorch_nobatch", 1,
-                                                self.data_type_)
+                                                self._data_type)
             self._test_helper(client, model_name, 'INPUT__0', 'OUTPUT__0')
 
     def test_custom(self):
         # custom_zero_1_float32 is identity model with input shape [-1]
-        for client in self.clients_:
-            model_name = tu.get_zero_model_name("custom", 1, self.data_type_)
+        for client in self._clients:
+            model_name = tu.get_zero_model_name("custom", 1, self._data_type)
             self._test_helper(client, model_name)
 
 
